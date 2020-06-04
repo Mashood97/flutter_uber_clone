@@ -10,7 +10,7 @@ class HomeProvider with ChangeNotifier {
   final Set<Marker> _markers = {};
   final Set<Polyline> _polylines = {};
 
-  String route;
+  String route, _durationTrip, _endAddress, _startAddress;
   final originTextEditingController = TextEditingController();
   final destinationTextEditingController = TextEditingController();
   GoogleMapsServices _googleMapsServices = GoogleMapsServices();
@@ -18,9 +18,20 @@ class HomeProvider with ChangeNotifier {
   LatLng _lastPosition = _initialPosition;
 
   //getters:
+
+  String get getEndAddress => _endAddress;
+
+  String get getStartAddress => _startAddress;
+  String get getDurationTrip=> _durationTrip;
+
   LatLng get getInitialPosition => _initialPosition;
+
   LatLng get getLastPosition => _lastPosition;
+
+
+
   Set<Marker> get getAllMarkers => _markers;
+
   Set<Polyline> get getAllPolyLines => _polylines;
 
   HomeProvider() {
@@ -42,7 +53,8 @@ class HomeProvider with ChangeNotifier {
 
 //send request to driver.
   LatLng origin;
-  void sendRequest(String intendedLocation, String originLocation) async {
+
+  Future<void> sendRequest(String intendedLocation, String originLocation) async {
     List<Placemark> placemark =
         await Geolocator().placemarkFromAddress(intendedLocation);
 
@@ -62,14 +74,43 @@ class HomeProvider with ChangeNotifier {
         origin = LatLng(originLatitude, originLongitude);
         route =
             await _googleMapsServices.getRouteCoordinates(origin, destination);
+        _endAddress =
+            await _googleMapsServices.getEndAddress(origin, destination);
+        _startAddress =
+            await _googleMapsServices.getStartAddress(origin, destination);
+
+        _durationTrip =
+            await _googleMapsServices.getDurationOfATrip(origin, destination);
+        print('Duration of a trip is: $_durationTrip');
       } catch (e) {
         route = await _googleMapsServices.getRouteCoordinates(
             _initialPosition, destination);
+        _endAddress = await _googleMapsServices.getEndAddress(
+            _initialPosition, destination);
+        _startAddress = await _googleMapsServices.getStartAddress(
+            _initialPosition, destination);
+        _durationTrip = await _googleMapsServices.getDurationOfATrip(
+            _initialPosition, destination);
+        print('Duration of a trip is: $_durationTrip');
       }
     } else {
+      //routes
       route = await _googleMapsServices.getRouteCoordinates(
           _initialPosition, destination);
+      //end Address
+      _endAddress = await _googleMapsServices.getEndAddress(
+          _initialPosition, destination);
+      //startAddress
+      _startAddress = await _googleMapsServices.getStartAddress(
+          _initialPosition, destination);
+      _durationTrip = await _googleMapsServices.getDurationOfATrip(
+          _initialPosition, destination);
+      print('Duration of a trip is: $_durationTrip');
     }
+
+    print('The endAddress is : $_endAddress');
+    print('The startAddress is : $_startAddress');
+
     addMarker(destination, intendedLocation);
 
     createRoute(route);
