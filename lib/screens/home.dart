@@ -5,15 +5,21 @@ import 'package:provider/provider.dart';
 import '../provider/home_provider.dart';
 
 class HomePage extends StatelessWidget {
+  final scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Map(),
+      key: scaffoldKey,
+      body: Map(scaffoldKey),
+      drawer: Drawer(),
     );
   }
 }
 
 class Map extends StatefulWidget {
+  final scaffoldkey;
+  Map(this.scaffoldkey);
   @override
   _MapState createState() => _MapState();
 }
@@ -23,7 +29,7 @@ class _MapState extends State<Map> {
 
   Widget getOriginTextField(var homeProv) {
     return Positioned(
-      top: 50.0,
+      top: 70.0,
       right: 15.0,
       left: 15.0,
       child: Container(
@@ -67,7 +73,7 @@ class _MapState extends State<Map> {
 
   Widget getDestinationTextField(var homeProv) {
     return Positioned(
-      top: 105.0,
+      top: 125.0,
       right: 15.0,
       left: 15.0,
       child: Container(
@@ -187,6 +193,14 @@ class _MapState extends State<Map> {
 
               getOriginTextField(homeProv),
               getDestinationTextField(homeProv),
+              Positioned(
+                left: 10,
+                top: 20,
+                child: IconButton(
+                  icon: Icon(Icons.menu),
+                  onPressed: () => widget.scaffoldkey.currentState.openDrawer(),
+                ),
+              ),
 //              Positioned(
 //                bottom: 30,
 //                left: 20,
