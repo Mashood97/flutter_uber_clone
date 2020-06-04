@@ -10,6 +10,7 @@ class HomeProvider with ChangeNotifier {
   final Set<Marker> _markers = {};
   final Set<Polyline> _polylines = {};
 
+  String route;
   final originTextEditingController = TextEditingController();
   final destinationTextEditingController = TextEditingController();
   GoogleMapsServices _googleMapsServices = GoogleMapsServices();
@@ -28,8 +29,8 @@ class HomeProvider with ChangeNotifier {
 
 //get user location
   void getUserLocation() async {
-    Position position = await Geolocator().getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.bestForNavigation);
+    Position position = await Geolocator()
+        .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     List<Placemark> placeMark = await Geolocator()
         .placemarkFromCoordinates(position.latitude, position.longitude);
     if (position != null) {
@@ -40,22 +41,57 @@ class HomeProvider with ChangeNotifier {
   }
 
 //send request to driver.
-  void sendRequest(String intendedLocation) async {
+  LatLng origin;
+  void sendRequest(String intendedLocation, String originLocation) async {
     List<Placemark> placemark =
         await Geolocator().placemarkFromAddress(intendedLocation);
+
     double latitude = placemark[0].position.latitude;
     double longitude = placemark[0].position.longitude;
+
     LatLng destination = LatLng(latitude, longitude);
-    String route = await _googleMapsServices.getRouteCoordinates(
-        _initialPosition, destination);
-    addMarker(destination, intendedLocation, route);
+
+    if (originLocation != null) {
+      try {
+        List<Placemark> originplacemark =
+            await Geolocator().placemarkFromAddress(originLocation);
+
+        double originLatitude = originplacemark[0].position.latitude;
+        double originLongitude = originplacemark[0].position.longitude;
+
+        origin = LatLng(originLatitude, originLongitude);
+        route =
+            await _googleMapsServices.getRouteCoordinates(origin, destination);
+      } catch (e) {
+        route = await _googleMapsServices.getRouteCoordinates(
+            _initialPosition, destination);
+      }
+    } else {
+      route = await _googleMapsServices.getRouteCoordinates(
+          _initialPosition, destination);
+    }
+    addMarker(destination, intendedLocation);
+
+    createRoute(route);
     notifyListeners();
     // createRoute(route);
   }
 
+  void createRoute(String route) async {
+    _polylines.add(
+      Polyline(
+          polylineId: PolylineId(_lastPosition.toString()),
+          visible: true,
+          color: Colors.black,
+          width: 3,
+          points: convertToLatLng(_decodePoly(route))),
+    );
+    notifyListeners();
+  }
+
   //add marker and polylines to destination
 
-  void addMarker(LatLng position, String address, String encodedPoly) {
+  void addMarker(LatLng position, String address) {
     _markers.add(Marker(
       markerId: MarkerId(_lastPosition.toString()),
       position: position,
@@ -66,14 +102,6 @@ class HomeProvider with ChangeNotifier {
       icon: BitmapDescriptor.defaultMarker,
     ));
 
-    _polylines.add(
-      Polyline(
-          polylineId: PolylineId(_lastPosition.toString()),
-          visible: true,
-          color: Colors.black,
-          width: 3,
-          points: convertToLatLng(_decodePoly(encodedPoly))),
-    );
     notifyListeners();
   }
 

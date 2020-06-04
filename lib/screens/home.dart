@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
-import '../utils/google_map_request.dart';
-import 'package:geolocator/geolocator.dart';
+
 import '../provider/home_provider.dart';
+
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -20,6 +20,12 @@ class Map extends StatefulWidget {
 
 class _MapState extends State<Map> {
   GoogleMapController mapController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Provider.of<HomeProvider>(context).getUserLocation();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -66,12 +72,15 @@ class _MapState extends State<Map> {
                     controller: homeProv.originTextEditingController,
                     decoration: InputDecoration(
                       icon: Container(
-                        margin: EdgeInsets.only(left: 20, top: 5),
+                        margin: EdgeInsets.only(left: 20),
                         width: 10,
                         height: 10,
-                        child: Icon(
-                          Icons.location_on,
-                          color: Colors.black,
+                        child: GestureDetector(
+                          onTap: homeProv.getUserLocation,
+                          child: Icon(
+                            Icons.location_on,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
                       hintText: "pick up",
@@ -106,7 +115,8 @@ class _MapState extends State<Map> {
                     textInputAction: TextInputAction.go,
                     onSubmitted: (value) {
                       // appState.sendRequest(value);
-                      homeProv.sendRequest(value);
+                      homeProv.sendRequest(value,
+                          homeProv.originTextEditingController.text.toString());
                     },
                     decoration: InputDecoration(
                       icon: Container(
@@ -146,12 +156,4 @@ class _MapState extends State<Map> {
       // mapController.setMapStyle(jsonEncode(mapStyle));
     });
   }
-
-
-  
-
- 
-
-  
- 
 }
