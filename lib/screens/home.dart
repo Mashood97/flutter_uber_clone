@@ -19,7 +19,9 @@ class HomePage extends StatelessWidget {
 
 class Map extends StatefulWidget {
   final scaffoldkey;
+
   Map(this.scaffoldkey);
+
   @override
   _MapState createState() => _MapState();
 }
@@ -187,10 +189,7 @@ class _MapState extends State<Map> {
                 markers: homeProv.getAllMarkers,
                 onCameraMove: homeProv.moveCamera,
                 polylines: homeProv.getAllPolyLines,
-                // markers: Set.from(allMarkers),
-                // polylines: _polyline,
               ),
-
               getOriginTextField(homeProv),
               getDestinationTextField(homeProv),
               Positioned(
@@ -201,33 +200,6 @@ class _MapState extends State<Map> {
                   onPressed: () => widget.scaffoldkey.currentState.openDrawer(),
                 ),
               ),
-//              Positioned(
-//                bottom: 30,
-//                left: 20,
-//                child: homeProv.getStartAddress == null
-//                    ? Text('')
-//                    : homeProv.getEndAddress == null
-//                        ? Text('')
-//                        : homeProv.getDurationTrip == null
-//                            ? Text('')
-//                            : Column(
-//                                children: [
-//                                  Text(homeProv.getStartAddress),
-//                                  Text(homeProv.getEndAddress),
-//                                  Text(homeProv.getDurationTrip),
-//                                ],
-//                              ),
-//              )
-              // Positioned(
-              //   top: 40,
-              //   right: 10,
-              //   child: FloatingActionButton(
-              //     child: Icon(Icons.add_location),
-              //     backgroundColor: Colors.black,
-              //     onPressed: addMarker,
-              //     tooltip: 'Add Marker',
-              //   ),
-              // )
             ],
           );
   }
