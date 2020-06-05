@@ -168,7 +168,7 @@ class _MapState extends State<Map> {
     showModalBottomSheet(
         context: context,
         isDismissible: false,
-        enableDrag: true,
+        enableDrag: false,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(15),

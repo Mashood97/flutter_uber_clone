@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_uber_clone/screens/auth_screen.dart';
+import 'package:flutter_uber_clone/screens/verify_screen.dart';
 import './screens/home.dart';
 import 'package:provider/provider.dart';
 import './provider/home_provider.dart';
 
 void main() {
+
   runApp(MyApp());
 }
 
@@ -16,7 +19,6 @@ class MyApp extends StatelessWidget {
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-
           fontFamily: 'oswald',
           primaryColor: Colors.black,
           appBarTheme: AppBarTheme(
@@ -27,9 +29,20 @@ class MyApp extends StatelessWidget {
               color: Colors.black
             )
           ),
+          textTheme: TextTheme(
+            headline6: TextStyle(
+              color: Colors.black,
+              fontSize: 24,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: HomePage(),
+        home: AuthScreen(),
+        routes: {
+          VerifyScreen.routeArgs:(ctx)=>VerifyScreen(),
+          HomePage.routeArgs:(ctx)=>HomePage(),
+        },
       ),
     );
   }
