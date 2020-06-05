@@ -35,6 +35,7 @@ dependencies:
   location:
   http:
   google_maps_webservice:
+  location_web:
   geolocator:
   shared_preferences:
   flutter_spinkit:

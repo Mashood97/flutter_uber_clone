@@ -16,7 +16,8 @@ class HomeProvider with ChangeNotifier {
   GoogleMapsServices _googleMapsServices = GoogleMapsServices();
 
   LatLng _lastPosition = _initialPosition;
-
+  int _AmountofATrip ;
+  int _PredictedAmountofATrip;
   //getters:
 
   String get getEndAddress => _endAddress;
@@ -24,9 +25,14 @@ class HomeProvider with ChangeNotifier {
   String get getStartAddress => _startAddress;
   String get getDurationTrip=> _durationTrip;
 
+  int get getAmountOfTrip=> _AmountofATrip;
+  int get getPredictedAmountOfTrip=> _PredictedAmountofATrip;
   LatLng get getInitialPosition => _initialPosition;
 
   LatLng get getLastPosition => _lastPosition;
+
+
+  int farePerMin = 5;
 
 
 
@@ -108,7 +114,11 @@ class HomeProvider with ChangeNotifier {
       print('Duration of a trip is: $_durationTrip');
     }
 
+    String x = _durationTrip.replaceAll('mins', '');
+    print(x);
+    _PredictedAmountofATrip = int.parse(x) * farePerMin;
     print('The endAddress is : $_endAddress');
+    print('The amount pred is : $_PredictedAmountofATrip');
     print('The startAddress is : $_startAddress');
 
     addMarker(destination, intendedLocation);
@@ -117,6 +127,8 @@ class HomeProvider with ChangeNotifier {
     notifyListeners();
     // createRoute(route);
   }
+
+
 
   void createRoute(String route) async {
     _polylines.add(
