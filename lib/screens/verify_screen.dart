@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_uber_clone/provider/auth_provider.dart';
 import 'package:flutter_uber_clone/widgets/rounded_button.dart';
 import 'package:flutter_uber_clone/widgets/user_text_field.dart';
+import 'package:provider/provider.dart';
 
 import 'home.dart';
 
 class VerifyScreen extends StatelessWidget {
 
   static const routeArgs = '/verify-screen';
+  final controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +46,7 @@ class VerifyScreen extends StatelessWidget {
                   titleLabel: 'Enter 6 digit Code',
                   maxLength: 6,
                   icon: Icons.dialpad,
+                  controller: controller,
                 ),
 
                 Align(

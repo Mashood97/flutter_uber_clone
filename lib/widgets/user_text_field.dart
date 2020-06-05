@@ -4,13 +4,15 @@ class UserTextField extends StatelessWidget {
   final titleLabel;
   final maxLength;
   final icon;
-  UserTextField({@required this.titleLabel,@required this.maxLength,@required this.icon});
+  final controller;
+  UserTextField({@required this.titleLabel,@required this.maxLength,@required this.icon,@required this.controller});
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: TextField(
         maxLength: maxLength,
+        controller: controller,
         keyboardType: TextInputType.phone,
         decoration: InputDecoration(
 
