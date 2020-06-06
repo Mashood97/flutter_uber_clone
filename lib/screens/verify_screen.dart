@@ -47,6 +47,30 @@ class VerifyScreen extends StatelessWidget {
     );
   }
 
+  verifyOTP(BuildContext context){
+    try {
+      Provider.of<AuthProvider>(context, listen: false)
+          .verifyOTP(controller.text.toString())
+          .then((_) {
+        Navigator.of(context)
+            .pushReplacementNamed(UserDataSignup.routeArgs);
+      }).catchError((e) {
+        String errorMsg =
+            'Cant authentiate you Right now, Try again later!';
+        if (e.toString().contains("ERROR_SESSION_EXPIRED")) {
+          errorMsg = "Session expired, please resend OTP!";
+        } else if (e
+            .toString()
+            .contains("ERROR_INVALID_VERIFICATION_CODE")) {
+          errorMsg = "You have entered wrong OTP!";
+        }
+        _showErrorDialog(context, errorMsg);
+      });
+    } catch (e) {
+      _showErrorDialog(context, e.toString());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(
@@ -88,27 +112,7 @@ class VerifyScreen extends StatelessWidget {
                   child: RoundedButton(
                     title: 'Verify Code',
                     onpressed: () {
-                      try {
-                        Provider.of<AuthProvider>(context, listen: false)
-                            .verifyOTP(controller.text.toString())
-                            .then((_) {
-                          Navigator.of(context)
-                              .pushReplacementNamed(UserDataSignup.routeArgs);
-                        }).catchError((e) {
-                          String errorMsg =
-                              'Cant authentiate you Right now, Try again later!';
-                          if (e.toString().contains("ERROR_SESSION_EXPIRED")) {
-                            errorMsg = "Session expired, please resend OTP!";
-                          } else if (e
-                              .toString()
-                              .contains("ERROR_INVALID_VERIFICATION_CODE")) {
-                            errorMsg = "You have entered wrong OTP!";
-                          }
-                          _showErrorDialog(context, errorMsg);
-                        });
-                      } catch (e) {
-                        _showErrorDialog(context, e.toString());
-                      }
+                     verifyOTP(context);
                     },
                   ),
                 ),

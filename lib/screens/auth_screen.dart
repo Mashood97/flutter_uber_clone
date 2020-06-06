@@ -48,6 +48,32 @@ class AuthScreen extends StatelessWidget {
     );
   }
 
+
+  verifyPhone(BuildContext context){
+    try {
+      Provider.of<AuthProvider>(context, listen: false)
+          .verifyPhone(
+          selectedCountryCode,
+          selectedCountryCode +
+              controller.text.toString())
+          .then((value) {
+        Navigator.of(context)
+            .pushNamed(VerifyScreen.routeArgs);
+      }).catchError((e) {
+        String errorMsg =
+            'Cant Authenticate you, Try Again Later';
+        if (e.toString().contains(
+            'We have blocked all requests from this device due to unusual activity. Try again later.')) {
+          errorMsg =
+          'Please wait as you have used limited number request';
+        }
+        _showErrorDialog(context, errorMsg);
+      });
+    } catch (e) {
+      _showErrorDialog(context, e.toString());
+    }
+  }
+
   void _onCountryChange(CountryCode countryCode) {
     selectedCountryCode = countryCode.toString();
     print("New Country selected: " + countryCode.toString());
@@ -101,28 +127,7 @@ class AuthScreen extends StatelessWidget {
                   child: RoundedButton(
                     title: 'Send OTP',
                     onpressed: () {
-                      try {
-                        Provider.of<AuthProvider>(context, listen: false)
-                            .verifyPhone(
-                                selectedCountryCode,
-                                selectedCountryCode +
-                                    controller.text.toString())
-                            .then((value) {
-                          Navigator.of(context)
-                              .pushNamed(VerifyScreen.routeArgs);
-                        }).catchError((e) {
-                          String errorMsg =
-                              'Cant Authenticate you, Try Again Later';
-                          if (e.toString().contains(
-                              'We have blocked all requests from this device due to unusual activity. Try again later.')) {
-                            errorMsg =
-                                'Please wait as you have used limited number request';
-                          }
-                          _showErrorDialog(context, errorMsg);
-                        });
-                      } catch (e) {
-                        _showErrorDialog(context, e.toString());
-                      }
+                      verifyPhone(context);
                     },
                   ),
                 ),
