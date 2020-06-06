@@ -5,7 +5,8 @@ class UserTextField extends StatelessWidget {
   final maxLength;
   final icon;
   final controller;
-  UserTextField({@required this.titleLabel,@required this.maxLength,@required this.icon,@required this.controller});
+  final inputType;
+  UserTextField({@required this.titleLabel,@required this.maxLength,@required this.icon,@required this.controller,@required this.inputType});
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -13,7 +14,7 @@ class UserTextField extends StatelessWidget {
       child: TextField(
         maxLength: maxLength,
         controller: controller,
-        keyboardType: TextInputType.phone,
+        keyboardType: inputType,
         decoration: InputDecoration(
 
           labelText: titleLabel,

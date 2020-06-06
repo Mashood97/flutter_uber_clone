@@ -1,74 +1,143 @@
-import 'dart:convert';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:crypto/crypto.dart';
+import 'package:encrypt/encrypt.dart';
+
+import 'package:flutter/foundation.dart' show ChangeNotifier;
+import '../utils/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import '../utils/flutter_secure_storage.dart';
+import 'dart:convert';
 
 class AuthProvider with ChangeNotifier {
   final _firebaseAuth = FirebaseAuth.instance;
   final _firestore = Firestore.instance;
-  String actualCode;
-  String status;
-  PhoneVerificationCompleted verificationCompleted;
-  PhoneVerificationFailed verificationFailed;
-  PhoneCodeAutoRetrievalTimeout codeAutoRetrievalTimeout;
-  PhoneCodeSent codeSent;
+  final SecureStorage _secureStorage = SecureStorage();
+  String _countryCode;
 
-  String _userId;
+  String _mobileNo;
+  String _userid;
+  String _userName;
+  String _cityName;
 
+  bool get getAutoLogin => _userid != null;
 
-  Future<void> verifyNo(
-    String phone,
-  ) async{
-    codeSent = (String verificationId, [int forceResendingToken]) async {
-      actualCode = verificationId;
+  String get getCountryCode => _countryCode;
+
+  String get getMobileNo => _mobileNo;
+
+  String get getUserId => _userid;
+
+  String get getUserName => _userName;
+
+  String get getCityName => _cityName;
+
+  String verificationId;
+
+  Future<void> verifyPhone(String countryCode, String mobile) async {
+    var mobileToSend = mobile;
+    final PhoneCodeSent smsOTPSent = (String verId, [int forceCodeResend]) {
+      this.verificationId = verId;
     };
-    codeAutoRetrievalTimeout = (String verificationId) {
-      actualCode = verificationId;
-    };
-    verificationFailed = (AuthException authException) {
-      status = '${authException.message}';
+    try {
+      await _firebaseAuth.verifyPhoneNumber(
+          phoneNumber: mobileToSend,
+          codeAutoRetrievalTimeout: (String verId) {
+            //Starts the phone number verification process for the given phone number.
+            //Either sends an SMS with a 6 digit code to the phone number specified, or sign's the user in and [verificationCompleted] is called.
+            this.verificationId = verId;
+          },
+          codeSent: smsOTPSent,
+          timeout: const Duration(
+            seconds: 120,
+          ),
+          verificationCompleted: (AuthCredential phoneAuthCredential) {
+            print(phoneAuthCredential);
+          },
+          verificationFailed: (AuthException exceptio) {
+            throw exceptio;
+          });
+      _countryCode = countryCode;
+      _mobileNo = mobile;
+    } catch (e) {
+      throw e;
+    }
+  }
 
-      print("Error message: " + status);
-      if (authException.message.contains('not authorized'))
-        status = 'Something has gone wrong, please try later';
-      else if (authException.message.contains('Network'))
-        status = 'Please check your internet connection and try again';
-      else
-        status = 'Something has gone wrong, please try later';
-    };
+  Future<void> verifyOTP(String otp) async {
+    try {
+      final AuthCredential credential = PhoneAuthProvider.getCredential(
+        verificationId: verificationId,
+        smsCode: otp,
+      );
+      final AuthResult user =
+          await _firebaseAuth.signInWithCredential(credential);
+      final FirebaseUser currentUser = await _firebaseAuth.currentUser();
+      print(user);
 
-    verificationCompleted = (AuthCredential auth) {
-      //_authCredential = auth;
+      print(currentUser.uid);
+      if (currentUser.uid != "") {
+        _userid = currentUser.uid;
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
 
-      _firebaseAuth.signInWithCredential(auth).then((AuthResult value) {
-        if (value.user != null) {
-          print("Sign in Successsfull");
-          _userId = value.user.uid;
-//           _firestore.collection('Users').add({
-//            'PhoneNumber': phone,
-//            'uid': _userId,
-//          });
+  showError(error) {
+    throw error.toString();
+  }
 
-        } else {
-          print("Sign in Failed");
-        }
-      }).catchError((error) {});
-    };
+  Future<void> addUserData(
+      String name, String cityName, String password) async {
+    try {
+      String getPassword = _secureStorage.encrypt(password);
 
-    _firebaseAuth.verifyPhoneNumber(
-        phoneNumber: phone,
-        timeout: Duration(seconds: 60),
-        verificationCompleted: verificationCompleted,
-        verificationFailed: verificationFailed,
-        codeSent: codeSent,
-        codeAutoRetrievalTimeout: codeAutoRetrievalTimeout);
+      print('the encrypted password is: $getPassword');
+      await _firestore.collection('RegisteredUser').add({
+        'username': name,
+        'countrycode': _countryCode,
+        'mobileNo': _mobileNo,
+        'cityName': cityName,
+        'password': getPassword
+      });
+
+      _userName = name;
+      _cityName = cityName;
+      notifyListeners();
+      final authData = json.encode({
+        'userid': _userid,
+        'username': _userName,
+        'phoneNo': _mobileNo,
+        'city': _cityName,
+        'countryCode': _countryCode,
+        'password': getPassword,
+      });
+      await SharedPref.init();
+
+      await SharedPref.setAuthdata(authData);
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  Future<bool> autoLogin() async {
+    await SharedPref.init();
+    String abc = SharedPref.getAuthData();
+    // if (abc == null || abc.isEmpty) {
+    //   return false;
+    // }
+    final extractedData = json.decode(abc) as Map<String, Object>;
+    if (extractedData == null || extractedData.isEmpty) {
+      return false;
+    }
+
+    _userName = extractedData['username'];
+    _userid = extractedData['userid'];
+    _mobileNo = extractedData['phoneNo'];
+    _countryCode = extractedData['countryCode'];
+    _cityName = extractedData['city'];
+
     notifyListeners();
-    final sharedpref = await SharedPreferences.getInstance();
-    final userData = json.encode({
-      'userId': _userId,
-    });
-    sharedpref.setString('userId', userData);
+    return true;
   }
 }
