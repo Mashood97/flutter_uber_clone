@@ -2,6 +2,7 @@ import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_uber_clone/screens/login_screen.dart';
 import 'package:flutter_uber_clone/screens/verify_screen.dart';
 import '../widgets/user_text_field.dart';
 import '../widgets/rounded_button.dart';
@@ -48,24 +49,18 @@ class AuthScreen extends StatelessWidget {
     );
   }
 
-
-  verifyPhone(BuildContext context){
+  verifyPhone(BuildContext context) {
     try {
       Provider.of<AuthProvider>(context, listen: false)
-          .verifyPhone(
-          selectedCountryCode,
-          selectedCountryCode +
-              controller.text.toString())
+          .verifyPhone(selectedCountryCode,
+              selectedCountryCode + controller.text.toString())
           .then((value) {
-        Navigator.of(context)
-            .pushNamed(VerifyScreen.routeArgs);
+        Navigator.of(context).pushNamed(VerifyScreen.routeArgs);
       }).catchError((e) {
-        String errorMsg =
-            'Cant Authenticate you, Try Again Later';
+        String errorMsg = 'Cant Authenticate you, Try Again Later';
         if (e.toString().contains(
             'We have blocked all requests from this device due to unusual activity. Try again later.')) {
-          errorMsg =
-          'Please wait as you have used limited number request';
+          errorMsg = 'Please wait as you have used limited number request';
         }
         _showErrorDialog(context, errorMsg);
       });
@@ -96,7 +91,7 @@ class AuthScreen extends StatelessWidget {
                     child: Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: Text(
-                        'PickUp',
+                        'Register Now',
                         style: Theme.of(context).textTheme.headline6,
                       ),
                     )),
@@ -128,6 +123,15 @@ class AuthScreen extends StatelessWidget {
                     title: 'Send OTP',
                     onpressed: () {
                       verifyPhone(context);
+                    },
+                  ),
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: RoundedButton(
+                    title: 'Login Instead',
+                    onpressed: () {
+                      Navigator.of(context).pushNamed(LoginScreen.routeArgs);
                     },
                   ),
                 ),

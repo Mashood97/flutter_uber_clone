@@ -9,25 +9,25 @@ class UserDataSignup extends StatelessWidget {
   static const routeArgs = '/userData';
 
   final nameController = TextEditingController();
+  final emailController = TextEditingController();
   final cityController = TextEditingController();
   final passwordController = TextEditingController();
 
   void _showErrorDialog(BuildContext context, String message) {
     showDialog(
       context: context,
-      builder: (ctx) =>
-          AlertDialog(
-            title: Text('Error Occured'),
-            content: Text(message),
-            actions: <Widget>[
-              FlatButton(
-                onPressed: () {
-                  Navigator.of(ctx).pop();
-                },
-                child: Text('OK!'),
-              )
-            ],
-          ),
+      builder: (ctx) => AlertDialog(
+        title: Text('Error Occured'),
+        content: Text(message),
+        actions: <Widget>[
+          FlatButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+            },
+            child: Text('OK!'),
+          )
+        ],
+      ),
     );
   }
 
@@ -63,10 +63,7 @@ class UserDataSignup extends StatelessWidget {
                       padding: const EdgeInsets.all(10.0),
                       child: Text(
                         'PickUp',
-                        style: Theme
-                            .of(context)
-                            .textTheme
-                            .headline6,
+                        style: Theme.of(context).textTheme.headline6,
                       ),
                     )),
                 Align(
@@ -75,18 +72,22 @@ class UserDataSignup extends StatelessWidget {
                     padding: const EdgeInsets.all(10.0),
                     child: Text(
                       'Please Fill the below form',
-                      style: Theme
-                          .of(context)
-                          .textTheme
-                          .headline6,
+                      style: Theme.of(context).textTheme.headline6,
                     ),
                   ),
                 ),
                 UserTextField(
                   titleLabel: 'Enter your full name',
-                  maxLength: 75,
+                  maxLength: 50,
                   icon: Icons.person_pin,
                   controller: nameController,
+                  inputType: TextInputType.text,
+                ),
+                UserTextField(
+                  titleLabel: 'Enter your Email',
+                  maxLength: 30,
+                  icon: Icons.person_pin,
+                  controller: emailController,
                   inputType: TextInputType.text,
                 ),
                 UserTextField(
@@ -109,24 +110,19 @@ class UserDataSignup extends StatelessWidget {
                     title: 'Done',
                     onpressed: () {
                       try {
-                        if (nameController.text
-                            .toString()
-                            .isNotEmpty &&
-                            cityController.text
-                                .toString()
-                                .isNotEmpty &&
-                            passwordController.text
-                                .toString()
-                                .isNotEmpty) {
+                        if (nameController.text.toString().isNotEmpty &&
+                            cityController.text.toString().isNotEmpty &&
+                            passwordController.text.toString().isNotEmpty &&
+                            emailController.text.toString().isNotEmpty) {
                           Provider.of<AuthProvider>(context, listen: false)
                               .addUserData(
-                              nameController.text.toString(),
-                              cityController.text.toString(),
-                              passwordController.text.toString());
+                                  nameController.text.toString(),
+                                  cityController.text.toString(),
+                                  passwordController.text.toString(),
+                                  emailController.text.toString());
                           Navigator.of(context)
                               .pushReplacementNamed(HomePage.routeArgs);
-                        }
-                        else {
+                        } else {
                           _showErrorDialog(context, 'Please Enter All Fields');
                         }
                       } catch (e) {

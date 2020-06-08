@@ -18,8 +18,11 @@ class AuthProvider with ChangeNotifier {
   String _userid;
   String _userName;
   String _cityName;
+  String _email;
 
   bool get getAutoLogin => _userid != null;
+
+  String get getuserEmail => _email;
 
   String get getCountryCode => _countryCode;
 
@@ -88,21 +91,24 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> addUserData(
-      String name, String cityName, String password) async {
+      String name, String cityName, String password, String email) async {
     try {
       String getPassword = _secureStorage.encrypt(password);
 
       print('the encrypted password is: $getPassword');
       await _firestore.collection('RegisteredUser').add({
         'username': name,
+        'userid': _userid,
         'countrycode': _countryCode,
         'mobileNo': _mobileNo,
         'cityName': cityName,
-        'password': getPassword
+        'password': getPassword,
+        'email': email,
       });
 
       _userName = name;
       _cityName = cityName;
+      _email = email;
       notifyListeners();
       final authData = json.encode({
         'userid': _userid,
@@ -111,6 +117,7 @@ class AuthProvider with ChangeNotifier {
         'city': _cityName,
         'countryCode': _countryCode,
         'password': getPassword,
+        'email': email
       });
       await SharedPref.init();
 
@@ -136,8 +143,42 @@ class AuthProvider with ChangeNotifier {
     _mobileNo = extractedData['phoneNo'];
     _countryCode = extractedData['countryCode'];
     _cityName = extractedData['city'];
+    _email = extractedData['email'];
 
     notifyListeners();
     return true;
+  }
+
+  void logout() async {
+    _userid = null;
+    _userName = null;
+    _cityName = null;
+    _countryCode = null;
+    _mobileNo = null;
+    notifyListeners();
+    await SharedPref.init();
+    SharedPref.clearSharedPrefData();
+  }
+
+  Future<void> signinWithEmailandPassword(String email, String password) async {
+    try {
+      await _firestore
+          .collection('RegisteredUser')
+          .where('email', isEqualTo: email)
+          .getDocuments()
+          .then((value) {
+        if (value.documents.isNotEmpty) {
+          Map<String, dynamic> documentData = value.documents.single.data;
+//          print();
+
+          String getPassword = _secureStorage.decrypt(
+              _secureStorage.convertToEncrypt(documentData['password']));
+          print(getPassword);
+          print(documentData['email']);
+        }
+      }).catchError((e) => throw e);
+    } catch (e) {
+      throw e;
+    }
   }
 }

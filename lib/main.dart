@@ -2,11 +2,12 @@ import 'package:country_code_picker/country_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_uber_clone/provider/auth_provider.dart';
 import 'package:flutter_uber_clone/screens/auth_screen.dart';
+import 'package:flutter_uber_clone/screens/login_screen.dart';
 import 'package:flutter_uber_clone/screens/user_data_signup.dart';
 import 'package:flutter_uber_clone/screens/verify_screen.dart';
 import './screens/home.dart';
 import 'package:provider/provider.dart';
-import './provider/home_provider.dart';
+import 'provider/home_provider.dart';
 
 void main() {
   runApp(MyApp());
@@ -68,6 +69,7 @@ class MyApp extends StatelessWidget {
             VerifyScreen.routeArgs: (ctx) => VerifyScreen(),
             HomePage.routeArgs: (ctx) => HomePage(),
             UserDataSignup.routeArgs: (ctx) => UserDataSignup(),
+            LoginScreen.routeArgs: (ctx) => LoginScreen(),
           },
         ),
       ),

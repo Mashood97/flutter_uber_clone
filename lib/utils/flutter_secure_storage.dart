@@ -16,10 +16,14 @@ class SecureStorage {
     return _encryptedData.base64;
   }
 
-  String decrypt(String password) {
+  String decrypt(var password) {
     getAesKey(_key);
-    _decryptedData = _encrypter.decrypt(_encryptedData, iv: _iv);
+    _decryptedData = _encrypter.decrypt(password, iv: _iv);
     return _decryptedData;
+  }
+
+  Encrypted convertToEncrypt(String password){
+    return Encrypted.fromBase64( password);
   }
 
   getAesKey(var key) {

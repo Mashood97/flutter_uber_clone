@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_uber_clone/widgets/main_drawer.dart';
 import '../widgets/map.dart';
 
 class HomePage extends StatelessWidget {
@@ -10,7 +11,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
       key: scaffoldKey,
       body: Map(scaffoldKey),
-      drawer: Drawer(),
+      drawer: MainDrawer(),
     );
   }
 }
