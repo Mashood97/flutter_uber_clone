@@ -55,7 +55,7 @@ class LoginScreen extends StatelessWidget {
                 Align(
                   alignment: Alignment.centerRight,
                   child: RoundedButton(
-                    title: 'Done',
+                    title: 'Login',
                     onpressed: () {
                       Provider.of<AuthProvider>(context, listen: false)
                           .signinWithEmailandPassword(
