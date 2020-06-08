@@ -6,7 +6,6 @@ import 'package:flutter_uber_clone/widgets/rounded_button.dart';
 import 'package:flutter_uber_clone/widgets/user_text_field.dart';
 import 'package:provider/provider.dart';
 
-import 'home.dart';
 
 class VerifyScreen extends StatelessWidget {
   static const routeArgs = '/verify-screen';
