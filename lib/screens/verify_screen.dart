@@ -121,6 +121,8 @@ class VerifyScreen extends StatelessWidget {
                   child: Image.asset(
                     'assets/images/verifyimg.png',
                     fit: BoxFit.cover,
+                    height: MediaQuery.of(context).size.height*0.4,
+                    width: MediaQuery.of(context).size.height*0.5,
                   ),
                 ),
               ],

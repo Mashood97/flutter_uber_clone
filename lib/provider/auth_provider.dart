@@ -176,6 +176,9 @@ class AuthProvider with ChangeNotifier {
           print(getPassword);
           print(documentData['email']);
         }
+        else{
+          throw Error();
+        }
       }).catchError((e) => throw e);
     } catch (e) {
       throw e;

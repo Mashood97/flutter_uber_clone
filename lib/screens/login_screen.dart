@@ -64,6 +64,15 @@ class LoginScreen extends StatelessWidget {
                     },
                   ),
                 ),
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Image.asset(
+                    'assets/images/login.png',
+                    fit: BoxFit.cover,
+                    height: MediaQuery.of(context).size.height*0.4,
+                    width: MediaQuery.of(context).size.height*0.5,
+                  ),
+                ),
               ],
             ),
           ),
