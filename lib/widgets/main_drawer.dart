@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_uber_clone/provider/auth_provider.dart';
+import 'package:flutter_uber_clone/screens/home.dart';
 import 'package:provider/provider.dart';
 
 class MainDrawer extends StatelessWidget {
@@ -16,8 +17,8 @@ class MainDrawer extends StatelessWidget {
             child: Stack(
               children: <Widget>[
                 Text(
-                  'Shopify',
-                  style: Theme.of(context).textTheme.title.copyWith(
+                  'PickUp',
+                  style: Theme.of(context).textTheme.headline6.copyWith(
                         fontSize: 25,
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
@@ -30,16 +31,17 @@ class MainDrawer extends StatelessWidget {
             height: 10,
           ),
           ListTile(
-            onTap: () => Navigator.of(context).pushReplacementNamed('/'),
+            onTap: () =>
+                Navigator.of(context).pushReplacementNamed(HomePage.routeArgs),
             title: Text(
-              'Shop',
+              'Home',
               style: Theme.of(context).textTheme.title.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
             ),
             trailing: Icon(
-              Icons.shopping_basket,
-              color: Theme.of(context).accentColor,
+              Icons.home,
+              color: Theme.of(context).primaryColor,
             ),
           ),
           Divider(),
@@ -48,30 +50,14 @@ class MainDrawer extends StatelessWidget {
 //                Navigator.of(context)
 //                .pushReplacementNamed(OrdersOverviewScreen.routeArgs),
             title: Text(
-              'Orders',
+              'My Rides',
               style: Theme.of(context).textTheme.headline6.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
             ),
             trailing: Icon(
-              Icons.payment,
-              color: Theme.of(context).accentColor,
-            ),
-          ),
-          Divider(),
-          ListTile(
-            onTap: () => {},
-//                Navigator.of(context)
-//                .pushReplacementNamed(UserProductsScreen.routeArgs),
-            title: Text(
-              'Manage Products',
-              style: Theme.of(context).textTheme.headline6.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-            ),
-            trailing: Icon(
-              Icons.edit,
-              color: Theme.of(context).accentColor,
+              Icons.directions_car,
+              color: Theme.of(context).primaryColor,
             ),
           ),
           Divider(),
@@ -81,8 +67,6 @@ class MainDrawer extends StatelessWidget {
               Navigator.of(context).pushReplacementNamed('/');
               Provider.of<AuthProvider>(context, listen: false).logout();
             },
-//                Navigator.of(context)
-//                    .pushReplacementNamed(AuthScreen.routeName),
             title: Text(
               'Logout',
               style: Theme.of(context).textTheme.headline6.copyWith(
@@ -91,7 +75,7 @@ class MainDrawer extends StatelessWidget {
             ),
             trailing: Icon(
               Icons.exit_to_app,
-              color: Theme.of(context).accentColor,
+              color: Theme.of(context).primaryColor,
             ),
           ),
         ],

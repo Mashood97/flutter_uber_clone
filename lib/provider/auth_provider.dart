@@ -3,6 +3,7 @@ import 'package:crypto/crypto.dart';
 import 'package:encrypt/encrypt.dart';
 
 import 'package:flutter/foundation.dart' show ChangeNotifier;
+import 'package:flutter_uber_clone/utils/http_exception.dart';
 import '../utils/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../utils/flutter_secure_storage.dart';
@@ -13,6 +14,8 @@ class AuthProvider with ChangeNotifier {
   final _firestore = Firestore.instance;
   final SecureStorage _secureStorage = SecureStorage();
   String _countryCode;
+
+  bool isLoading = false;
 
   String _mobileNo;
   String _userid;
@@ -35,6 +38,16 @@ class AuthProvider with ChangeNotifier {
   String get getCityName => _cityName;
 
   String verificationId;
+
+  void setisLoadingTrue() {
+    isLoading = true;
+    notifyListeners();
+  }
+
+  void setisLoadingFalse() {
+    isLoading = false;
+    notifyListeners();
+  }
 
   Future<void> verifyPhone(String countryCode, String mobile) async {
     var mobileToSend = mobile;
@@ -80,6 +93,8 @@ class AuthProvider with ChangeNotifier {
       print(currentUser.uid);
       if (currentUser.uid != "") {
         _userid = currentUser.uid;
+      } else {
+        throw HttpException('Cant Verify User');
       }
     } catch (e) {
       throw e;
@@ -166,18 +181,39 @@ class AuthProvider with ChangeNotifier {
           .collection('RegisteredUser')
           .where('email', isEqualTo: email)
           .getDocuments()
-          .then((value) {
+          .then((value) async {
         if (value.documents.isNotEmpty) {
           Map<String, dynamic> documentData = value.documents.single.data;
 //          print();
 
           String getPassword = _secureStorage.decrypt(
               _secureStorage.convertToEncrypt(documentData['password']));
-          print(getPassword);
-          print(documentData['email']);
-        }
-        else{
-          throw Error();
+          if (password == getPassword) {
+            print(getPassword);
+            print(documentData['email']);
+            _userid = documentData['userid'];
+            _userName = documentData['username'];
+            _cityName = documentData['cityName'];
+            _countryCode = documentData['countrycode'];
+            _mobileNo = documentData['mobileNo'];
+            final authData = json.encode({
+              'userid': _userid,
+              'username': _userName,
+              'phoneNo': _mobileNo,
+              'city': _cityName,
+              'countryCode': _countryCode,
+              'password': password,
+              'email': email
+            });
+            notifyListeners();
+            await SharedPref.init();
+
+            await SharedPref.setAuthdata(authData);
+          } else {
+            throw HttpException('Password isn\'t correct');
+          }
+        } else {
+          throw HttpException('Signin Failed, Please Enter Correct Credential');
         }
       }).catchError((e) => throw e);
     } catch (e) {
