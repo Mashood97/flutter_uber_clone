@@ -13,6 +13,7 @@ class AuthScreen extends StatelessWidget {
   final controller = TextEditingController();
 
   String selectedCountryCode = '';
+  String selectedCountryCodeName = '';
 
   showSnackBar(msg, color, context) {
     Scaffold.of(context).showSnackBar(
@@ -52,7 +53,7 @@ class AuthScreen extends StatelessWidget {
   verifyPhone(BuildContext context) {
     try {
       Provider.of<AuthProvider>(context, listen: false)
-          .verifyPhone(selectedCountryCode,
+          .verifyPhone(selectedCountryCodeName, selectedCountryCode,
               selectedCountryCode + controller.text.toString())
           .then((value) {
         Navigator.of(context).pushNamed(VerifyScreen.routeArgs);
@@ -70,8 +71,10 @@ class AuthScreen extends StatelessWidget {
   }
 
   void _onCountryChange(CountryCode countryCode) {
-    selectedCountryCode = countryCode.toString();
-    print("New Country selected: " + countryCode.toString());
+    selectedCountryCode = countryCode.dialCode;
+    selectedCountryCodeName = countryCode.code;
+    print("New Country selected: " + selectedCountryCodeName);
+//    print("New Country selected: " + selectedCountryCode);
   }
 
   @override
@@ -140,8 +143,8 @@ class AuthScreen extends StatelessWidget {
                   child: Image.asset(
                     'assets/images/authimage.png',
                     fit: BoxFit.cover,
-                    height: MediaQuery.of(context).size.height*0.4,
-                    width: MediaQuery.of(context).size.height*0.5,
+                    height: MediaQuery.of(context).size.height * 0.4,
+                    width: MediaQuery.of(context).size.height * 0.5,
                   ),
                 ),
               ],

@@ -1,7 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:crypto/crypto.dart';
-import 'package:encrypt/encrypt.dart';
-
 import 'package:flutter/foundation.dart' show ChangeNotifier;
 import 'package:flutter_uber_clone/utils/http_exception.dart';
 import '../utils/shared_preferences.dart';
@@ -22,10 +19,13 @@ class AuthProvider with ChangeNotifier {
   String _userName;
   String _cityName;
   String _email;
+  String _countryCodeName;
 
   bool get getAutoLogin => _userid != null;
 
   String get getuserEmail => _email;
+
+  String get getCountryCodeName => _countryCodeName;
 
   String get getCountryCode => _countryCode;
 
@@ -49,7 +49,8 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> verifyPhone(String countryCode, String mobile) async {
+  Future<void> verifyPhone(
+      String countryCodename, String countryCode, String mobile) async {
     var mobileToSend = mobile;
     final PhoneCodeSent smsOTPSent = (String verId, [int forceCodeResend]) {
       this.verificationId = verId;
@@ -73,6 +74,7 @@ class AuthProvider with ChangeNotifier {
             throw exceptio;
           });
       _countryCode = countryCode;
+      _countryCodeName = countryCodename;
       _mobileNo = mobile;
     } catch (e) {
       throw e;
@@ -115,6 +117,7 @@ class AuthProvider with ChangeNotifier {
         'username': name,
         'userid': _userid,
         'countrycode': _countryCode,
+        'countrycodeName': _countryCodeName,
         'mobileNo': _mobileNo,
         'cityName': cityName,
         'password': getPassword,
@@ -124,6 +127,7 @@ class AuthProvider with ChangeNotifier {
       _userName = name;
       _cityName = cityName;
       _email = email;
+
       notifyListeners();
       final authData = json.encode({
         'userid': _userid,
@@ -131,6 +135,7 @@ class AuthProvider with ChangeNotifier {
         'phoneNo': _mobileNo,
         'city': _cityName,
         'countryCode': _countryCode,
+        'countryCodeName': _countryCodeName,
         'password': getPassword,
         'email': email
       });
@@ -157,6 +162,7 @@ class AuthProvider with ChangeNotifier {
     _userid = extractedData['userid'];
     _mobileNo = extractedData['phoneNo'];
     _countryCode = extractedData['countryCode'];
+    _countryCodeName = extractedData['countryCodeName'];
     _cityName = extractedData['city'];
     _email = extractedData['email'];
 
@@ -170,6 +176,7 @@ class AuthProvider with ChangeNotifier {
     _cityName = null;
     _countryCode = null;
     _mobileNo = null;
+    _countryCodeName = null;
     notifyListeners();
     await SharedPref.init();
     SharedPref.clearSharedPrefData();
@@ -195,6 +202,7 @@ class AuthProvider with ChangeNotifier {
             _userName = documentData['username'];
             _cityName = documentData['cityName'];
             _countryCode = documentData['countrycode'];
+            _countryCodeName = documentData['countryCodeName'];
             _mobileNo = documentData['mobileNo'];
             final authData = json.encode({
               'userid': _userid,
@@ -202,6 +210,7 @@ class AuthProvider with ChangeNotifier {
               'phoneNo': _mobileNo,
               'city': _cityName,
               'countryCode': _countryCode,
+              'countryCodeName': _countryCodeName,
               'password': password,
               'email': email
             });

@@ -86,7 +86,7 @@ class UserDataSignup extends StatelessWidget {
                 UserTextField(
                   titleLabel: 'Enter your Email',
                   maxLength: 30,
-                  icon: Icons.person_pin,
+                  icon: Icons.email,
                   controller: emailController,
                   inputType: TextInputType.text,
                 ),

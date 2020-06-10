@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
           localizationsDelegates: [
             CountryLocalizations.delegate,
           ],
-          title: 'Flutter Demo',
+          title: 'Flutter Uber Clone',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             fontFamily: 'oswald',

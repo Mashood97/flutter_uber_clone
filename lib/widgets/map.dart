@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_webservice/places.dart';
 import 'package:provider/provider.dart';
 
 import '../provider/home_provider.dart';
@@ -80,11 +82,15 @@ class _MapState extends State<Map> {
           ],
         ),
         child: TextField(
+          onTap: () async {
+            homeProv.getAutoCompletePlaceTextField(context);
+          },
           cursorColor: Colors.black,
           controller: homeProv.destinationTextEditingController,
           textInputAction: TextInputAction.go,
           onSubmitted: (value) {
             // appState.sendRequest(value);
+//            print(value);
             homeProv
                 .sendRequest(
                     value, homeProv.originTextEditingController.text.toString())
@@ -114,7 +120,10 @@ class _MapState extends State<Map> {
   Widget getTitle(String title, var textStyle) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Text(title, style: textStyle,),
+      child: Text(
+        title,
+        style: textStyle,
+      ),
     );
   }
 
@@ -167,7 +176,6 @@ class _MapState extends State<Map> {
   void getBottomSheet(var homeProv) {
     showModalBottomSheet(
         context: context,
-        isDismissible: false,
         enableDrag: false,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
@@ -175,65 +183,50 @@ class _MapState extends State<Map> {
             topRight: Radius.circular(15),
           ),
         ),
-        builder: (ctx) => Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            getTitle('Your Pick-Up Point:',TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 18
-            )),
-            getTitle(homeProv.getStartAddress,TextStyle(
-                fontWeight: FontWeight.w400,
-                fontSize: 16
-            )),
-            getTitle('Your Destination Point:',TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 18
-            )),
-            getTitle(homeProv.getEndAddress,TextStyle(
-                fontWeight: FontWeight.w400,
-                fontSize: 16
-            )),
-            getTitle('Duration and Predicted Fare of a trip',TextStyle(
-                fontWeight: FontWeight.w600,
-                fontSize: 18
-            )),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-
-                getTitle(homeProv.getDurationTrip,TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 18
-                )),
-
-                getTitle('${homeProv.getPredictedAmountOfTrip} PKR',TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 18
-                )),
-              ],
-            ),
-
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: FlatButton(
-                color: Colors.black,
-                onPressed: () {},
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                splashColor: Colors.purple,
-                child: Text(
-                  'Confirm Ride',
-                  style: TextStyle(
-                    color: Colors.white,
+        builder: (ctx) => SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  getTitle('Your Pick-Up Point:',
+                      TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
+                  getTitle(homeProv.getStartAddress,
+                      TextStyle(fontWeight: FontWeight.w400, fontSize: 16)),
+                  getTitle('Your Destination Point:',
+                      TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
+                  getTitle(homeProv.getEndAddress,
+                      TextStyle(fontWeight: FontWeight.w400, fontSize: 16)),
+                  getTitle('Duration and Predicted Fare of a trip',
+                      TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      getTitle(homeProv.getDurationTrip,
+                          TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
+                      getTitle('${homeProv.getPredictedAmountOfTrip} PKR',
+                          TextStyle(fontWeight: FontWeight.w600, fontSize: 18)),
+                    ],
                   ),
-                ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: FlatButton(
+                      color: Colors.black,
+                      onPressed: () {},
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      splashColor: Colors.purple,
+                      child: Text(
+                        'Confirm Ride',
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ));
+            ));
   }
 
   @override

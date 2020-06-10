@@ -1,9 +1,14 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_google_places/flutter_google_places.dart';
 import 'package:flutter_uber_clone/utils/google_map_request.dart';
+import 'package:flutter_uber_clone/utils/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_webservice/places.dart';
 
 class HomeProvider with ChangeNotifier {
   static LatLng _initialPosition;
@@ -16,25 +21,27 @@ class HomeProvider with ChangeNotifier {
   GoogleMapsServices _googleMapsServices = GoogleMapsServices();
 
   LatLng _lastPosition = _initialPosition;
-  int _AmountofATrip ;
+  int _AmountofATrip;
+
   int _PredictedAmountofATrip;
+
   //getters:
 
   String get getEndAddress => _endAddress;
 
   String get getStartAddress => _startAddress;
-  String get getDurationTrip=> _durationTrip;
 
-  int get getAmountOfTrip=> _AmountofATrip;
-  int get getPredictedAmountOfTrip=> _PredictedAmountofATrip;
+  String get getDurationTrip => _durationTrip;
+
+  int get getAmountOfTrip => _AmountofATrip;
+
+  int get getPredictedAmountOfTrip => _PredictedAmountofATrip;
+
   LatLng get getInitialPosition => _initialPosition;
 
   LatLng get getLastPosition => _lastPosition;
 
-
   int farePerMin = 5;
-
-
 
   Set<Marker> get getAllMarkers => _markers;
 
@@ -60,7 +67,8 @@ class HomeProvider with ChangeNotifier {
 //send request to driver.
   LatLng origin;
 
-  Future<void> sendRequest(String intendedLocation, String originLocation) async {
+  Future<void> sendRequest(
+      String intendedLocation, String originLocation) async {
     List<Placemark> placemark =
         await Geolocator().placemarkFromAddress(intendedLocation);
 
@@ -128,7 +136,29 @@ class HomeProvider with ChangeNotifier {
     // createRoute(route);
   }
 
+  Future<void> getAutoCompletePlaceTextField(BuildContext context) async {
+    await SharedPref.init();
+    String abc = SharedPref.getAuthData();
+    // if (abc == null || abc.isEmpty) {
+    //   return false;
+    // }
+    final extractedData = json.decode(abc) as Map<String, Object>;
+    if (extractedData == null || extractedData.isEmpty) {
+      return false;
+    }
 
+    print(extractedData['countryCodeName']);
+    Prediction p = await PlacesAutocomplete.show(
+      context: context,
+      apiKey: 'AIzaSyBvOO0sBLjH3B9tylTfTJubczi-HuTHpZ0',
+      language: "en",
+      components: [
+        Component(Component.country, extractedData['countryCodeName']),
+      ],
+    );
+    print(p.structuredFormatting.mainText);
+    destinationTextEditingController.text = p.structuredFormatting.mainText;
+  }
 
   void createRoute(String route) async {
     _polylines.add(
