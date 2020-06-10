@@ -24,6 +24,9 @@ class HomeProvider with ChangeNotifier {
   int _AmountofATrip;
 
   int _PredictedAmountofATrip;
+  GoogleMapController mapController;
+
+
 
   //getters:
 
@@ -160,6 +163,14 @@ class HomeProvider with ChangeNotifier {
     destinationTextEditingController.text = p.structuredFormatting.mainText;
   }
 
+
+  void onMapCreated(controller) {
+
+      mapController = controller;
+      notifyListeners();
+      // mapController.setMapStyle(jsonEncode(mapStyle));
+
+  }
   void createRoute(String route) async {
     _polylines.add(
       Polyline(

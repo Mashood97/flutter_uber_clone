@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_google_places/flutter_google_places.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:google_maps_webservice/places.dart';
 import 'package:provider/provider.dart';
 
 import '../provider/home_provider.dart';
@@ -16,8 +15,6 @@ class Map extends StatefulWidget {
 }
 
 class _MapState extends State<Map> {
-  GoogleMapController mapController;
-
   Widget getOriginTextField(var homeProv) {
     return Positioned(
       top: 70.0,
@@ -49,7 +46,7 @@ class _MapState extends State<Map> {
                 onTap: homeProv.getUserLocation,
                 child: Icon(
                   Icons.location_on,
-                  color: Colors.black,
+                  color: Theme.of(context).primaryColor,
                 ),
               ),
             ),
@@ -105,7 +102,7 @@ class _MapState extends State<Map> {
               height: 10,
               child: Icon(
                 Icons.local_taxi,
-                color: Colors.black,
+                color: Theme.of(context).primaryColor,
               ),
             ),
             hintText: "Enter your destination",
@@ -210,7 +207,7 @@ class _MapState extends State<Map> {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: FlatButton(
-                      color: Colors.black,
+                      color: Theme.of(context).primaryColor,
                       onPressed: () {},
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -233,11 +230,21 @@ class _MapState extends State<Map> {
   Widget build(BuildContext context) {
     final homeProv = Provider.of<HomeProvider>(context);
     return homeProv.getInitialPosition == null
-        ? Center(child: CircularProgressIndicator())
+        ? SpinKitSquareCircle(
+            itemBuilder: (BuildContext context, int index) {
+              return DecoratedBox(
+                decoration: BoxDecoration(
+                  color: index.isEven
+                      ? Theme.of(context).primaryColor
+                      : Theme.of(context).accentColor,
+                ),
+              );
+            },
+          )
         : Stack(
             children: [
               GoogleMap(
-                onMapCreated: onMapCreated,
+                onMapCreated: homeProv.onMapCreated,
                 initialCameraPosition: CameraPosition(
                   target: homeProv.getInitialPosition,
                   zoom: 12.0,
@@ -261,12 +268,5 @@ class _MapState extends State<Map> {
               ),
             ],
           );
-  }
-
-  void onMapCreated(controller) {
-    setState(() {
-      mapController = controller;
-      // mapController.setMapStyle(jsonEncode(mapStyle));
-    });
   }
 }
