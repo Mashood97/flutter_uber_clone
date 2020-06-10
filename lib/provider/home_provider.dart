@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_google_places/flutter_google_places.dart';
@@ -19,13 +20,13 @@ class HomeProvider with ChangeNotifier {
   final originTextEditingController = TextEditingController();
   final destinationTextEditingController = TextEditingController();
   GoogleMapsServices _googleMapsServices = GoogleMapsServices();
+  final _firestore = Firestore.instance;
 
   LatLng _lastPosition = _initialPosition;
   int _AmountofATrip;
 
   int _PredictedAmountofATrip;
   GoogleMapController mapController;
-
 
 
   //getters:
@@ -70,10 +71,10 @@ class HomeProvider with ChangeNotifier {
 //send request to driver.
   LatLng origin;
 
-  Future<void> sendRequest(
-      String intendedLocation, String originLocation) async {
+  Future<void> sendRequest(String intendedLocation,
+      String originLocation) async {
     List<Placemark> placemark =
-        await Geolocator().placemarkFromAddress(intendedLocation);
+    await Geolocator().placemarkFromAddress(intendedLocation);
 
     double latitude = placemark[0].position.latitude;
     double longitude = placemark[0].position.longitude;
@@ -83,21 +84,21 @@ class HomeProvider with ChangeNotifier {
     if (originLocation != null) {
       try {
         List<Placemark> originplacemark =
-            await Geolocator().placemarkFromAddress(originLocation);
+        await Geolocator().placemarkFromAddress(originLocation);
 
         double originLatitude = originplacemark[0].position.latitude;
         double originLongitude = originplacemark[0].position.longitude;
 
         origin = LatLng(originLatitude, originLongitude);
         route =
-            await _googleMapsServices.getRouteCoordinates(origin, destination);
+        await _googleMapsServices.getRouteCoordinates(origin, destination);
         _endAddress =
-            await _googleMapsServices.getEndAddress(origin, destination);
+        await _googleMapsServices.getEndAddress(origin, destination);
         _startAddress =
-            await _googleMapsServices.getStartAddress(origin, destination);
+        await _googleMapsServices.getStartAddress(origin, destination);
 
         _durationTrip =
-            await _googleMapsServices.getDurationOfATrip(origin, destination);
+        await _googleMapsServices.getDurationOfATrip(origin, destination);
         print('Duration of a trip is: $_durationTrip');
       } catch (e) {
         route = await _googleMapsServices.getRouteCoordinates(
@@ -165,12 +166,12 @@ class HomeProvider with ChangeNotifier {
 
 
   void onMapCreated(controller) {
-
-      mapController = controller;
-      notifyListeners();
-      // mapController.setMapStyle(jsonEncode(mapStyle));
+    mapController = controller;
+    notifyListeners();
+    // mapController.setMapStyle(jsonEncode(mapStyle));
 
   }
+
   void createRoute(String route) async {
     _polylines.add(
       Polyline(
@@ -247,10 +248,13 @@ class HomeProvider with ChangeNotifier {
     } while (index < len);
 
 /*adding to previous value as done in encoding */
-    for (var i = 2; i < lList.length; i++) lList[i] += lList[i - 2];
+    for (var i = 2; i < lList.length; i++)
+      lList[i] += lList[i - 2];
 
     print(lList.toString());
 
     return lList;
   }
+
+
 }

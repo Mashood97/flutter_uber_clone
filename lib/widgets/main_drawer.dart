@@ -4,10 +4,9 @@ import 'package:flutter_uber_clone/screens/home.dart';
 import 'package:provider/provider.dart';
 
 class MainDrawer extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
-  final provData = Provider.of<AuthProvider>(context);
+    final provData = Provider.of<AuthProvider>(context);
     return Drawer(
       child: Column(
         children: <Widget>[
@@ -22,18 +21,18 @@ class MainDrawer extends StatelessWidget {
                 children: <Widget>[
                   CircleAvatar(
                     backgroundColor: Theme.of(context).accentColor,
-                    child: Text(provData.getCountryCodeName),
+                    child: Text(provData.getCountryCodeName ?? ''),
                   ),
                   Text(
-                    provData.getUserName,
-                    style: Theme.of(context).textTheme.headline6.copyWith(
+                    provData.getUserName ?? '',
+                     style: Theme.of(context).textTheme.headline6.copyWith(
                           fontSize: 18,
                           color: Colors.white,
                           fontWeight: FontWeight.w700,
                         ),
                   ),
                   Text(
-                  provData.getuserEmail,
+                    provData.getuserEmail ?? '',
                     style: Theme.of(context).textTheme.headline6.copyWith(
                           fontSize: 16,
                           color: Colors.white,
@@ -47,7 +46,6 @@ class MainDrawer extends StatelessWidget {
           SizedBox(
             height: 10,
           ),
-
           ListTile(
             onTap: () =>
                 Navigator.of(context).pushReplacementNamed(HomePage.routeArgs),
