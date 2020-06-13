@@ -2,19 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
-
+import 'package:firebase_messaging/firebase_messaging.dart';
 import '../provider/home_provider.dart';
 
-class Map extends StatefulWidget {
+class Maps extends StatefulWidget {
   final scaffoldkey;
 
-  Map(this.scaffoldkey);
+  Maps(this.scaffoldkey);
 
   @override
   _MapState createState() => _MapState();
 }
 
-class _MapState extends State<Map> {
+class _MapState extends State<Maps> {
+  final _firebaseMessaging = FirebaseMessaging();
+
   Widget getOriginTextField(var homeProv) {
     return Positioned(
       top: 70.0,
@@ -92,7 +94,7 @@ class _MapState extends State<Map> {
                 .sendRequest(
                     value, homeProv.originTextEditingController.text.toString())
                 .then((_) {
-              getBottomSheet(homeProv);
+              getBottomSheet(homeProv,homeProv.addRequestDatatoFireStore);
             });
           },
           decoration: InputDecoration(
@@ -114,7 +116,7 @@ class _MapState extends State<Map> {
     );
   }
 
-  Widget getTitle(String title, var textStyle) {
+  Widget getTitle(String title, var textStyle)  {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Text(
@@ -124,53 +126,7 @@ class _MapState extends State<Map> {
     );
   }
 
-//  void getBottomSheet(var homeProv) {
-//    DraggableScrollableSheet(
-//      initialChildSize: 0.3,
-//      expand: true,
-//      minChildSize: 0.2,
-//      maxChildSize: 1.0,
-//      builder: (context, scrollController) {
-//        return Container(
-//          color: Colors.red,
-//          child: ListView(controller: scrollController, children: [
-//            Expanded(
-//              child: Column(
-//                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-//                crossAxisAlignment: CrossAxisAlignment.start,
-//                children: [
-//                  getTitle('Your Pick-Up Point:'),
-//                  getTitle(homeProv.getStartAddress),
-//                  getTitle('Your Destination Point:'),
-//                  getTitle(homeProv.getEndAddress),
-//                  getTitle('Duration of a trip'),
-//                  getTitle(homeProv.getDurationTrip),
-//                  Padding(
-//                    padding: const EdgeInsets.all(8.0),
-//                    child: FlatButton(
-//                      color: Colors.black,
-//                      onPressed: () {},
-//                      shape: RoundedRectangleBorder(
-//                        borderRadius: BorderRadius.circular(10),
-//                      ),
-//                      child: Text(
-//                        'Confirm Ride',
-//                        style: TextStyle(
-//                          color: Colors.white,
-//                        ),
-//                      ),
-//                    ),
-//                  ),
-//                ],
-//              ),
-//            ),
-//          ]),
-//        );
-//      },
-//    );
-//  }
-
-  void getBottomSheet(var homeProv) {
+  void getBottomSheet(var homeProv,Function onpress) {
     showModalBottomSheet(
         context: context,
         enableDrag: false,
@@ -208,7 +164,7 @@ class _MapState extends State<Map> {
                     padding: const EdgeInsets.all(8.0),
                     child: FlatButton(
                       color: Theme.of(context).primaryColor,
-                      onPressed: () {},
+                      onPressed: onpress,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -225,6 +181,25 @@ class _MapState extends State<Map> {
               ),
             ));
   }
+
+  @override
+  void initState() {
+    super.initState();
+    _firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        print("onMessage: $message");
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        print("onLaunch: $message");
+      },
+      onResume: (Map<String, dynamic> message) async {
+        print("onResume: $message");
+      },
+    );
+    _firebaseMessaging.requestNotificationPermissions(
+        const IosNotificationSettings(sound: true, badge: true, alert: true));
+  }
+
 
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_uber_clone/widgets/main_drawer.dart';
-import '../widgets/map.dart';
+import '../widgets/maps.dart';
 
 class HomePage extends StatelessWidget {
   static const routeArgs = '/homepage';
@@ -10,7 +10,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       key: scaffoldKey,
-      body: Map(scaffoldKey),
+      body: Maps(scaffoldKey),
       drawer: MainDrawer(),
     );
   }

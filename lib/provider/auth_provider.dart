@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart' show ChangeNotifier;
 import 'package:flutter_uber_clone/utils/http_exception.dart';
 import '../utils/shared_preferences.dart';
@@ -9,6 +10,7 @@ import 'dart:convert';
 class AuthProvider with ChangeNotifier {
   final _firebaseAuth = FirebaseAuth.instance;
   final _firestore = Firestore.instance;
+  final _firebaseMessaging = FirebaseMessaging();
   final SecureStorage _secureStorage = SecureStorage();
   String _countryCode;
 
@@ -20,8 +22,11 @@ class AuthProvider with ChangeNotifier {
   String _cityName;
   String _email;
   String _countryCodeName;
+  String _firebaseToken;
 
   bool get getAutoLogin => _userid != null;
+
+  String get getFCMToken => _firebaseToken;
 
   String get getuserEmail => _email;
 
@@ -112,21 +117,26 @@ class AuthProvider with ChangeNotifier {
     try {
       String getPassword = _secureStorage.encrypt(password);
 
-      print('the encrypted password is: $getPassword');
-      await _firestore.collection('RegisteredUser').add({
-        'username': name,
-        'userid': _userid,
-        'countrycode': _countryCode,
-        'countrycodeName': _countryCodeName,
-        'mobileNo': _mobileNo,
-        'cityName': cityName,
-        'password': getPassword,
-        'email': email,
+      await _firebaseMessaging.getToken().then((token) {
+        _firebaseToken = token;
+        _firestore.collection('RegisteredUser').add({
+          'username': name,
+          'userid': _userid,
+          'countrycode': _countryCode,
+          'countrycodeName': _countryCodeName,
+          'mobileNo': _mobileNo,
+          'cityName': cityName,
+          'password': getPassword,
+          'email': email,
+          'fcmToken': _firebaseToken,
+        });
+
+        _userName = name;
+        _cityName = cityName;
+        _email = email;
       });
 
-      _userName = name;
-      _cityName = cityName;
-      _email = email;
+      print('the encrypted password is: $getPassword');
 
       notifyListeners();
       final authData = json.encode({
@@ -137,7 +147,8 @@ class AuthProvider with ChangeNotifier {
         'countryCode': _countryCode,
         'countryCodeName': _countryCodeName,
         'password': getPassword,
-        'email': email
+        'email': email,
+        'fcmToken': _firebaseToken,
       });
       await SharedPref.init();
 
@@ -165,6 +176,9 @@ class AuthProvider with ChangeNotifier {
     _countryCodeName = extractedData['countryCodeName'];
     _cityName = extractedData['city'];
     _email = extractedData['email'];
+    _firebaseToken = extractedData['fcmToken'];
+
+
 
     notifyListeners();
     return true;
@@ -177,6 +191,7 @@ class AuthProvider with ChangeNotifier {
     _countryCode = null;
     _mobileNo = null;
     _countryCodeName = null;
+    _firebaseToken = null;
     notifyListeners();
     await SharedPref.init();
     SharedPref.clearSharedPrefData();
@@ -204,6 +219,8 @@ class AuthProvider with ChangeNotifier {
             _countryCode = documentData['countrycode'];
             _countryCodeName = documentData['countryCodeName'];
             _mobileNo = documentData['mobileNo'];
+            _firebaseToken = documentData['fcmToken'];
+
             final authData = json.encode({
               'userid': _userid,
               'username': _userName,
@@ -212,7 +229,8 @@ class AuthProvider with ChangeNotifier {
               'countryCode': _countryCode,
               'countryCodeName': _countryCodeName,
               'password': password,
-              'email': email
+              'email': email,
+              'fcmToken': _firebaseToken,
             });
             notifyListeners();
             await SharedPref.init();

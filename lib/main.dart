@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             fontFamily: 'oswald',
-            primaryColor: Colors.deepPurpleAccent,
+            primaryColor: Colors.orangeAccent,
             canvasColor: Colors.white,
             appBarTheme: AppBarTheme(
                 actionsIconTheme: IconThemeData(
